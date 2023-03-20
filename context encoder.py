@@ -119,6 +119,73 @@ class Encoder(nn.Module):
     x = self.encoder(x)
     return x
 
+class Decoder(nn.Module):
+  def __init__(self):
+    super(Decoder,self).__init__()
+    self.decoder = nn.Sequential(nn.ConvTranspose2d(in_channels=4000,out_channels=512,kernel_size=4,stride=1,padding=0),
+                                 nn.BatchNorm2d(512),
+                                 nn.ReLU(),
+                                 nn.ConvTranspose2d(in_channels=512,out_channels=256,kernel_size=4,stride=2,padding=1),
+                                 nn.BatchNorm2d(256),
+                                 nn.ReLU(),
+                                 nn.ConvTranspose2d(in_channels=256,out_channels=128,kernel_size=4,stride=2,padding=1),
+                                 nn.BatchNorm2d(128),
+                                 nn.ReLU(),
+                                 nn.ConvTranspose2d(in_channels=128,out_channels=64,kernel_size=4,stride=2,padding=1),
+                                 nn.BatchNorm2d(64),
+                                 nn.ReLU(),
+                                 nn.ConvTranspose2d(in_channels=64,out_channels=64,kernel_size=4,stride=2,padding=1),
+                                 nn.BatchNorm2d(64),
+                                 nn.ReLU(),
+                                 nn.ConvTranspose2d(in_channels=64,out_channels=3,kernel_size=4,stride=2,padding=1),
+                                 nn.ReLU(),
+                                 )
+  def forward(self, x):
+    x = self.decoder(x)
+    return x
+
+
+class ContextEncoder(nn.Module):
+    def __init__(self):
+        super(ContextEncoder, self).__init__()
+        self.encoder = Encoder()
+        self.decoder = Decoder()
+
+    def forward(self, x):
+        bottleneck = self.encoder(x)
+        images = self.decoder(bottleneck)
+        return images
+
+class Discriminator(nn.Module):
+    def __init__(self):
+      super(Discriminator,self).__init__()
+      self.encoder = nn.Sequential(nn.Conv2d(in_channels=3,out_channels=64,kernel_size=4,stride=2,padding=1),
+                                  nn.BatchNorm2d(64),
+                                  nn.LeakyReLU(0.2),
+                                   nn.Conv2d(in_channels=64,out_channels=64,kernel_size=4,stride=2,padding=1),
+                                  nn.BatchNorm2d(64),
+                                  nn.LeakyReLU(0.2),
+                                  nn.Conv2d(in_channels=64,out_channels=128,kernel_size=4,stride=2,padding=1),
+                                  nn.BatchNorm2d(128),
+                                  nn.LeakyReLU(0.2),
+                                  nn.Conv2d(in_channels=128,out_channels=256,kernel_size=4,stride=2,padding=1),
+                                  nn.BatchNorm2d(256),
+                                  nn.LeakyReLU(0.2),
+                                  nn.Conv2d(in_channels=256,out_channels=512,kernel_size=4,stride=2,padding=1),
+                                  nn.BatchNorm2d(512),
+                                  nn.LeakyReLU(0.2),
+                                  nn.Conv2d(in_channels=512,out_channels=1,kernel_size=4,stride=1,padding=0),
+                                  nn.BatchNorm2d(1),
+                                  nn.LeakyReLU(0.2),
+                                  nn.Flatten(),
+                                  nn.Sigmoid()
+                                  )
+    def forward(self, x):
+      x = self.encoder(x)
+      return x
+
+
+
+
 if __name__ == '__main__':
-    aa= Data()
-    Encoder().forward(nn)
+    ContextEncoder().forward(nn)
